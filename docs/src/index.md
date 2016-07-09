@@ -1,11 +1,21 @@
 
 # CoupledFields.jl Documentation
 
-## Types and Functions
+## Types
+
+```@docs
+ModelObj
+KernelParameters
+GaussianKP
+PolynomialKP
+```
+
+
+## Functions 
 
 ```@autodocs
 Modules = [CoupledFields]
-Order   = [:type, :function]
+Order   = [:function]
 ```
 
 ## Example
@@ -34,9 +44,8 @@ function simfn(n::Int, p::Int,sc::Float64, sige::Float64)
     return zscore(X,1), Y, xstar, ystar
 end
 
-function createDF{T<:Matrix{Float64}}(c::Float64, X::T, Y::T, modelpars::ModelParameters)
-    ∇g = hcat(gradvecfield([c -7.0], X, Y, modelpars)...)'
-    sc = 0.05
+function createDF{T<:Matrix{Float64}}(c::Float64, X::T, Y::T, kpars::KernelParameters; sc=1.0)
+    ∇g = hcat(gradvecfield([c -7.0], X, Y, kpars)...)'
     vecf = [X-∇g*sc X+∇g*sc] 
     DataFrame(x=X[:,1], y=X[:,2], x1=vecf[:,1], y1=vecf[:,2], x2=vecf[:,3],y2=vecf[:,4], col=Y[:,1],
         par="σ=$c"*"σ<sub>med</sub>")
@@ -44,9 +53,10 @@ end
 
 srand(1234)
 X, Y, xstar, ystar = simfn(200, 2,30.0, 0.1)
-mpars = distm(X)
 
-D1 = vcat([createDF(c, X, ystar[:,1:1], mpars) for c in [0.5 0.05]  ]...) 
+kpars = GaussianKP(X)
+D1 = vcat([createDF(c, X, ystar[:,1:1], kpars, sc=0.05) for c in [0.5 0.05]  ]...)   ;
+
 
 colscale = Scale.color_continuous(minvalue=-2.0, maxvalue=2.0)
 coord = Coord.cartesian(xmin=-2.0, xmax=2.0, ymin=-2.0, ymax=2.0)
