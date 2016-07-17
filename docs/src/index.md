@@ -4,6 +4,7 @@
 ## Types
 
 ```@docs
+InputSpace
 ModelObj
 KernelParameters
 GaussianKP

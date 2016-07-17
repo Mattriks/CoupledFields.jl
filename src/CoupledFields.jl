@@ -1,11 +1,11 @@
 module CoupledFields
 
 using MLKernels
-export ModelObj
+export InputSpace, ModelObj
 export KernelParameters, GaussianKP, PolynomialKP
 export gradvecfield
 export bf, cca, gKCCA
-
+export whiten
 
 """
     KernelParameters: An abstract type.
@@ -83,6 +83,26 @@ end
 
 
 
+"""
+    InputSpace: A type to hold the `X` and `Y` fields of the Input space
+InputSpace(X, Y, d, lat): The fields are whitened if `d=[d1, d2]` is supplied.
+Area weighting is applied if `lat` is supplied.      
+"""
+type InputSpace
+    X::Matrix{Float64} 
+    Y::Matrix{Float64}
+    function InputSpace{T<:Matrix{Float64}}(a::T, b::T)
+        new(zscore(a,1), zscore(b,1))
+    end
+    function InputSpace{T<:Matrix{Float64}}(a::T, b::T, d::Vector{Float64})
+        new(whiten(a, d[1]), whiten(b, d[2]))
+    end
+    function InputSpace{T<:Matrix{Float64},V<:Vector{Float64}}(a::T, b::T, d::V, lat::V)
+        new(whiten(a, d[1], lat=lat), whiten(b, d[2], lat=lat))
+    end
+end
+
+
 
 """
     gradvecfield{N<:Float64, T<:Matrix{Float64}}(par::Array{N}, X::T, Y::T, kpars::KernelParameters ):
@@ -143,7 +163,8 @@ function cca{T<:Matrix{Float64}}(v::Array{Float64}, X::T,Y::T)
     return ModelObj(Wx, Tx, Wy, Ty, L, v, "CCA")
 end
 
-cca{T<:Matrix{Float64}}(v::Array{Float64}, X::T,Y::T, kpars::KernelParameters) = cca{T<:Matrix{Float64}}(v::Array{Float64}, X::T,Y::T)
+
+cca{T<:Matrix{Float64}}(v::Array{Float64}, X::T,Y::T, kpars::KernelParameters) = cca(v, X, Y)
 
 
 """
@@ -171,6 +192,29 @@ function gKCCA(par::Array{Float64}, X::Matrix{Float64}, Y::Matrix{Float64}, kpar
     
     return ModelObj(Wx, R, Ay, T, flipdim(ev.values,1), par, "gKCCA")
 end
+
+
+
+
+
+
+"""
+    whiten(x::Matrix{Float64}, d::Float64; lat=nothing): Whiten matrix
+`d` (0-1) Percentage variance of components to retain. \n
+`lat` Latitudinal area-weighting.
+"""
+function whiten(x::Matrix{Float64}, d::Float64; lat=nothing)
+    m1 = zscore(x,1)
+    if lat != nothing
+        scale!(m1, 1.0./sqrt(cos(pi*lat/180)) )
+    end
+    sv = svdfact(m1)
+    l = cumsum(sv[:S].^2)/sumabs2(sv[:S])
+    U = sv[:U][:, l.≤d]
+    U /= std(U[:,1])
+    return U
+end 
+
 
 
 

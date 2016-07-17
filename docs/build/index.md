@@ -8,6 +8,17 @@
 
 ## Types
 
+<a id='CoupledFields.InputSpace' href='#CoupledFields.InputSpace'>#</a>
+**`CoupledFields.InputSpace`** &mdash; *Type*.
+
+
+
+```
+InputSpace: A type to hold the `X` and `Y` fields of the Input space
+```
+
+InputSpace(X, Y, d, lat): The fields are whitened if `d=[d1, d2]` is supplied. Area weighting is applied if `lat` is supplied.      
+
 <a id='CoupledFields.ModelObj' href='#CoupledFields.ModelObj'>#</a>
 **`CoupledFields.ModelObj`** &mdash; *Type*.
 
@@ -98,6 +109,19 @@ gradvecfield{N<:Float64, T<:Matrix{Float64}}(par::Array{N}, X::T, Y::T, kpars::K
 ```
 
 Compute the gradient vector or gradient matrix at each instance of the `X` and `Y` fields, by making use of a kernel feature space.
+
+<a id='CoupledFields.whiten-Tuple{Array{Float64,2},Float64}' href='#CoupledFields.whiten-Tuple{Array{Float64,2},Float64}'>#</a>
+**`CoupledFields.whiten`** &mdash; *Method*.
+
+
+
+```
+whiten(x::Matrix{Float64}, d::Float64; lat=nothing): Whiten matrix
+```
+
+`d` (0-1) Percentage variance of components to retain. 
+
+`lat` Latitudinal area-weighting.
 
 
 <a id='Example-1'></a>
