@@ -14,4 +14,9 @@ Pkg.build("CoupledFields")
 
 ## Documentation
 
-Documentation with examples is available [here](../master/docs/build/index.md)
+Documentation is available [here](../master/docs/build/index.md)
+
+## Examples
+
+[Example 1](../master/examples/Example1.md)
+

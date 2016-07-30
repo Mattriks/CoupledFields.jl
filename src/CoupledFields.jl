@@ -203,8 +203,8 @@ end
 `d` (0-1) Percentage variance of components to retain. \n
 `lat` Latitudinal area-weighting.
 """
-function whiten(x::Matrix{Float64}, d::Float64; lat=nothing)
-    m1 = zscore(x,1)
+function whiten(X::Matrix{Float64}, d::Float64; lat=nothing)
+    m1 = zscore(X,1)
     if lat != nothing
         scale!(m1, 1.0./sqrt(cos(pi*lat/180)) )
     end
