@@ -19,5 +19,5 @@ Documentation is available [here](../master/docs/build/index.md)
 ## Examples
 
 [Example 1](../master/examples/Example1.md)  
- [Example 2](../master/examples/Example2.md)
+[Example 2](../master/examples/Example2.md)
 
