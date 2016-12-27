@@ -1,9 +1,4 @@
-
-
-## Example 1
-
-This example requires the Gadfly branch [Geom_segment](https://github.com/Mattriks/Gadfly.jl/tree/Geom_segment) for plotting the vectorfield.
-Note that `CoupledFields` by itself does not require this branch. 
+# Example 1
 
 ```julia
 using StatsBase: zscore
@@ -49,6 +44,8 @@ p = plot(D1,  xgroup=:par,
         layer(x=:x, y=:y, color=:col, Geom.point, Theme(default_point_size=2pt)) 
     ),
     colscale,
+    Scale.x_continuous(minvalue=-2.0, maxvalue=2.0),
+    Scale.y_continuous(minvalue=-2.0, maxvalue=2.0),
     Guide.xlabel("X<sub>1</sub>"),
     Guide.ylabel("X<sub>2</sub>"),
     Guide.colorkey("Y")

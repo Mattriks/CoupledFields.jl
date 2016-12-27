@@ -1,6 +1,4 @@
-
-
-## Example 2
+# Example 2
 
 ```julia
 using StatsBase: zscore
@@ -12,11 +10,9 @@ function rHypersphere(n::Int, k::Int)
     return Q[:,1:n]  
 end
 
-
-function simfn(n::Int, p::Int,sc::Float64, sige::Float64)
+function simfn(n::Int, p::Int, sc::Float64, sige::Float64)
     Wx = rHypersphere(2,p)
     Wy = rHypersphere(2,2)
-    println(inv(Wy))
     X = sc*rand(n,p)-(sc/2)
     E = sige*randn(n,1)
     xstar = X * Wx
@@ -25,7 +21,7 @@ function simfn(n::Int, p::Int,sc::Float64, sige::Float64)
     return zscore(X,1), Y, xstar, ystar
 end
 
-createDF = function(df::Int,Y::Matrix{Float64})
+createDF = function(df::Int, Y::Matrix{Float64})
     Xs = bf(gKCCAm.R[:,1], df)
     CCAm = cca([-9. -9.], Xs, Y)
     return DataFrame(x=gkCCAm.R[:,1], y= CCAm.T[:,1], y2 = CCAm.R[:,1]-mean(CCAm.R[:,1]), df="<i>df</i>=$df")

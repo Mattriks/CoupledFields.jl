@@ -1,11 +1,12 @@
 module CoupledFields
 
-using MLKernels
+# using MLKernels
 export InputSpace, ModelObj
 export KernelParameters, GaussianKP, PolynomialKP
 export gradvecfield
 export bf, cca, gKCCA
 export whiten
+ include("MLKernels.jl")
 
 """
     KernelParameters: An abstract type.
@@ -78,7 +79,7 @@ type ModelObj
     T::Matrix{Float64}
     evals::Vector{Float64}
     pars::Array{Float64}
-    method::ASCIIString
+    method::String
 end
 
 
@@ -113,7 +114,7 @@ function gradvecfield{N<:Float64, T<:Matrix{Float64}}(par::Array{N}, X::T, Y::T,
     Ix = (10.0^par[2])*n*eye(n)
     Gx = kpars.Kf(par, X, kpars)
     ∇K = kpars.∇Kf(par, X, kpars)
-    return [squeeze(∇K[i,:,:],1)' * ((Gx+Ix) \ Y) for i in 1:n]
+    return [∇K[i,:,:]' * ((Gx+Ix) \ Y) for i in 1:n]
 end
 
 
@@ -214,7 +215,6 @@ function whiten(X::Matrix{Float64}, d::Float64; lat=nothing)
     U /= std(U[:,1])
     return U
 end 
-
 
 
 

@@ -1,22 +1,17 @@
 
 # CoupledFields.jl Documentation
 
-## Types
+## Guide Outline
 
-```@docs
-InputSpace
-ModelObj
-KernelParameters
-GaussianKP
-PolynomialKP
+```@contents
+Pages = map(file -> joinpath("man", file), readdir("man"))
+Depth = 1
 ```
 
+## Library Outline
 
-## Functions 
-
-```@autodocs
-Modules = [CoupledFields]
-Order   = [:function]
+```@contents
+Pages = [joinpath("lib","library.md")]
 ```
 
 
