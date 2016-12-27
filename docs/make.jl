@@ -2,7 +2,7 @@ using Documenter, CoupledFields
 
 makedocs(
     modules = [CoupledFields],
-    format = :html,
+#    format = :html,
     sitename = "CoupledFields.jl",
     pages = Any[ 
         "Home" => "index.md",
