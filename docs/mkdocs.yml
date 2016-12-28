@@ -1,5 +1,5 @@
-site_name:        CoupledFields.jl
-repo_url:         https://github.com/Mattriks/CoupledFields.jl
+site_name:        CoupledFields
+repo_url:         https://github.com/Mattriks/CoupledFields
 site_description: Package for working with coupled fields
 site_author:      Mattriks
 

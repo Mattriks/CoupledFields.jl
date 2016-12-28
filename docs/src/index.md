@@ -1,5 +1,5 @@
 
-# CoupledFields.jl Documentation
+# CoupledFields Documentation
 
 ## Guide Outline
 
