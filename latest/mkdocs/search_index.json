@@ -1,0 +1,69 @@
+{
+    "docs": [
+        {
+            "location": "/", 
+            "text": "CoupledFields Documentation\n\n\n\n\nGuide Outline\n\n\n\n\nExample 1\n\n\nExample 2\n\n\n\n\n\n\nLibrary Outline\n\n\n\n\nLibrary\n\n\nContents\n\n\nTypes\n\n\nFunctions", 
+            "title": "Home"
+        }, 
+        {
+            "location": "/#coupledfields-documentation", 
+            "text": "", 
+            "title": "CoupledFields Documentation"
+        }, 
+        {
+            "location": "/#guide-outline", 
+            "text": "Example 1  Example 2", 
+            "title": "Guide Outline"
+        }, 
+        {
+            "location": "/#library-outline", 
+            "text": "Library  Contents  Types  Functions", 
+            "title": "Library Outline"
+        }, 
+        {
+            "location": "/man/Example1/", 
+            "text": "Example 1\n\n\nusing StatsBase: zscore\nusing DataFrames, Gadfly\nusing CoupledFields\n\nfunction rHypersphere(n::Int, k::Int)\n    Q = qrfact(randn(k,k))[:Q]\n    return Q[:,1:n]  \nend\n\nfunction simfn(n::Int, p::Int,sc::Float64, sige::Float64)\n    Wx = rHypersphere(2,p)\n    Wy = rHypersphere(2,2)\n    X = sc*rand(n,p)-(sc/2)\n    E = sige*randn(n,1)\n    xstar = X * Wx\n    ystar = zscore([6.3*xstar[:,1].*exp(-0.1*xstar[:,1].^2) randn(n,1)],1)\n    Y =  ystar / Wy\n    return zscore(X,1), Y, xstar, ystar\nend\n\nfunction createDF{T\n:Matrix{Float64}}(c::Float64, X::T, Y::T, kpars::KernelParameters; sc=1.0)\n    \u2207g = hcat(gradvecfield([c -7.0], X, Y, kpars)...)'\n    vecf = [X-\u2207g*sc X+\u2207g*sc] \n    DataFrame(x=X[:,1], y=X[:,2], x1=vecf[:,1], y1=vecf[:,2], x2=vecf[:,3],y2=vecf[:,4], col=Y[:,1],\n        par=\n\u03c3=$c\n*\n\u03c3\nsub\nmed\n/sub\n)\nend\n\nsrand(1234)\nX, Y, xstar, ystar = simfn(200, 2,30.0, 0.1)\n\nkpars = GaussianKP(X)\nD1 = vcat([createDF(c, X, ystar[:,1:1], kpars, sc=0.05) for c in [0.5 0.05]  ]...)   ;\n\n\ncolscale = Scale.color_continuous(minvalue=-2.0, maxvalue=2.0)\ncoord = Coord.cartesian(xmin=-2.0, xmax=2.0, ymin=-2.0, ymax=2.0)\n\np = plot(D1,  xgroup=:par,\n    Geom.subplot_grid(coord,\n        layer(x=:x1, y=:y1,xend=:x2, yend=:y2, color=:col, Geom.vector),\n        layer(x=:x, y=:y, color=:col, Geom.point, Theme(default_point_size=2pt)) \n    ),\n    colscale,\n    Scale.x_continuous(minvalue=-2.0, maxvalue=2.0),\n    Scale.y_continuous(minvalue=-2.0, maxvalue=2.0),\n    Guide.xlabel(\nX\nsub\n1\n/sub\n),\n    Guide.ylabel(\nX\nsub\n2\n/sub\n),\n    Guide.colorkey(\nY\n)\n)", 
+            "title": "Example 1"
+        }, 
+        {
+            "location": "/man/Example1/#example-1", 
+            "text": "using StatsBase: zscore\nusing DataFrames, Gadfly\nusing CoupledFields\n\nfunction rHypersphere(n::Int, k::Int)\n    Q = qrfact(randn(k,k))[:Q]\n    return Q[:,1:n]  \nend\n\nfunction simfn(n::Int, p::Int,sc::Float64, sige::Float64)\n    Wx = rHypersphere(2,p)\n    Wy = rHypersphere(2,2)\n    X = sc*rand(n,p)-(sc/2)\n    E = sige*randn(n,1)\n    xstar = X * Wx\n    ystar = zscore([6.3*xstar[:,1].*exp(-0.1*xstar[:,1].^2) randn(n,1)],1)\n    Y =  ystar / Wy\n    return zscore(X,1), Y, xstar, ystar\nend\n\nfunction createDF{T :Matrix{Float64}}(c::Float64, X::T, Y::T, kpars::KernelParameters; sc=1.0)\n    \u2207g = hcat(gradvecfield([c -7.0], X, Y, kpars)...)'\n    vecf = [X-\u2207g*sc X+\u2207g*sc] \n    DataFrame(x=X[:,1], y=X[:,2], x1=vecf[:,1], y1=vecf[:,2], x2=vecf[:,3],y2=vecf[:,4], col=Y[:,1],\n        par= \u03c3=$c * \u03c3 sub med /sub )\nend\n\nsrand(1234)\nX, Y, xstar, ystar = simfn(200, 2,30.0, 0.1)\n\nkpars = GaussianKP(X)\nD1 = vcat([createDF(c, X, ystar[:,1:1], kpars, sc=0.05) for c in [0.5 0.05]  ]...)   ;\n\n\ncolscale = Scale.color_continuous(minvalue=-2.0, maxvalue=2.0)\ncoord = Coord.cartesian(xmin=-2.0, xmax=2.0, ymin=-2.0, ymax=2.0)\n\np = plot(D1,  xgroup=:par,\n    Geom.subplot_grid(coord,\n        layer(x=:x1, y=:y1,xend=:x2, yend=:y2, color=:col, Geom.vector),\n        layer(x=:x, y=:y, color=:col, Geom.point, Theme(default_point_size=2pt)) \n    ),\n    colscale,\n    Scale.x_continuous(minvalue=-2.0, maxvalue=2.0),\n    Scale.y_continuous(minvalue=-2.0, maxvalue=2.0),\n    Guide.xlabel( X sub 1 /sub ),\n    Guide.ylabel( X sub 2 /sub ),\n    Guide.colorkey( Y )\n)", 
+            "title": "Example 1"
+        }, 
+        {
+            "location": "/man/Example2/", 
+            "text": "Example 2\n\n\nusing StatsBase: zscore\nusing DataFrames, Compose, Gadfly\nusing CoupledFields\n\nfunction rHypersphere(n::Int, k::Int)\n    Q = qrfact(randn(k,k))[:Q]\n    return Q[:,1:n]  \nend\n\nfunction simfn(n::Int, p::Int, sc::Float64, sige::Float64)\n    Wx = rHypersphere(2,p)\n    Wy = rHypersphere(2,2)\n    X = sc*rand(n,p)-(sc/2)\n    E = sige*randn(n,1)\n    xstar = X * Wx\n    ystar = zscore([6.3*xstar[:,1].*exp(-0.1*xstar[:,1].^2) randn(n,1)],1)\n    Y =  ystar / Wy\n    return zscore(X,1), Y, xstar, ystar\nend\n\ncreateDF = function(df::Int, Y::Matrix{Float64})\n    Xs = bf(gKCCAm.R[:,1], df)\n    CCAm = cca([-9. -9.], Xs, Y)\n    return DataFrame(x=gkCCAm.R[:,1], y= CCAm.T[:,1], y2 = CCAm.R[:,1]-mean(CCAm.R[:,1]), df=\ni\ndf\n/i\n=$df\n)\nend    \n\nsrand(1234)\nX, Y, xstar, ystar = simfn(200, 2,30.0, 0.1)\n\nkpars = GaussianKP(X)\ngKCCAm = gKCCA([0.2, -5, 1], X, Y, kpars )\n\nplotfn = function(v) \n    mlfs = 10pt\n    D1= vcat([createDF(df, Y) for df in v]...)\n\nplot(D1, xgroup=:df,\n    Geom.subplot_grid(Coord.cartesian(ymin=-3, ymax=3),\n        layer(x=:x, y=:y2, Geom.line,  Theme(default_color=colorant\nred\n)),\n        layer(x=:x, y=:y, Geom.point)\n    ),\n    Guide.ylabel(\nb\nYA\n/b\nsub\n1\n/sub\n),\n    Theme(plot_padding=0mm, major_label_font_size=mlfs)\n )\nend\n\npb = plotfn(4:6)\nGadfly.add_plot_element!(pb, Guide.xlabel(\nb\nXW\n/b\nsub\n1\n/sub\n (gKCCA)\n ))\n\nM = Array(Compose.Context, (2,1))\nM[1] = compose(context(0,0, 1.0, 0.45), render(plotfn(1:3)))\nM[2] = compose(context(0,0, 1.0, 0.55), render(pb))\n\nvstack(M...)", 
+            "title": "Example 2"
+        }, 
+        {
+            "location": "/man/Example2/#example-2", 
+            "text": "using StatsBase: zscore\nusing DataFrames, Compose, Gadfly\nusing CoupledFields\n\nfunction rHypersphere(n::Int, k::Int)\n    Q = qrfact(randn(k,k))[:Q]\n    return Q[:,1:n]  \nend\n\nfunction simfn(n::Int, p::Int, sc::Float64, sige::Float64)\n    Wx = rHypersphere(2,p)\n    Wy = rHypersphere(2,2)\n    X = sc*rand(n,p)-(sc/2)\n    E = sige*randn(n,1)\n    xstar = X * Wx\n    ystar = zscore([6.3*xstar[:,1].*exp(-0.1*xstar[:,1].^2) randn(n,1)],1)\n    Y =  ystar / Wy\n    return zscore(X,1), Y, xstar, ystar\nend\n\ncreateDF = function(df::Int, Y::Matrix{Float64})\n    Xs = bf(gKCCAm.R[:,1], df)\n    CCAm = cca([-9. -9.], Xs, Y)\n    return DataFrame(x=gkCCAm.R[:,1], y= CCAm.T[:,1], y2 = CCAm.R[:,1]-mean(CCAm.R[:,1]), df= i df /i =$df )\nend    \n\nsrand(1234)\nX, Y, xstar, ystar = simfn(200, 2,30.0, 0.1)\n\nkpars = GaussianKP(X)\ngKCCAm = gKCCA([0.2, -5, 1], X, Y, kpars )\n\nplotfn = function(v) \n    mlfs = 10pt\n    D1= vcat([createDF(df, Y) for df in v]...)\n\nplot(D1, xgroup=:df,\n    Geom.subplot_grid(Coord.cartesian(ymin=-3, ymax=3),\n        layer(x=:x, y=:y2, Geom.line,  Theme(default_color=colorant red )),\n        layer(x=:x, y=:y, Geom.point)\n    ),\n    Guide.ylabel( b YA /b sub 1 /sub ),\n    Theme(plot_padding=0mm, major_label_font_size=mlfs)\n )\nend\n\npb = plotfn(4:6)\nGadfly.add_plot_element!(pb, Guide.xlabel( b XW /b sub 1 /sub  (gKCCA)  ))\n\nM = Array(Compose.Context, (2,1))\nM[1] = compose(context(0,0, 1.0, 0.45), render(plotfn(1:3)))\nM[2] = compose(context(0,0, 1.0, 0.55), render(pb))\n\nvstack(M...)", 
+            "title": "Example 2"
+        }, 
+        {
+            "location": "/lib/library/", 
+            "text": "Library\n\n\n\n\nContents\n\n\n\n\nLibrary\n\n\nContents\n\n\nTypes\n\n\nFunctions\n\n\n\n\n\n\n\n\n\n\nTypes\n\n\n#\n\n\nCoupledFields.InputSpace\n \n \nType\n.\n\n\nInputSpace: A type to hold the `X` and `Y` fields of the Input space\n\n\n\n\nInputSpace(X, Y, d, lat): The fields are whitened if \nd=[d1, d2]\n is supplied. Area weighting is applied if \nlat\n is supplied.      \n\n\nsource\n\n\n#\n\n\nCoupledFields.ModelObj\n \n \nType\n.\n\n\nModelObj: A type to hold statistical model results\n\n\n\n\nSuch as the matrices \nW, R, A, T\n, where \nR=XW\n and \nT=YA\n.  \n\n\nsource\n\n\n#\n\n\nCoupledFields.KernelParameters\n \n \nType\n.\n\n\nKernelParameters: An abstract type.\n\n\n\n\nAll KernelParameters types contain Kf and \u2207Kf i.e. a kernel function and its first derivative. Some instances also contain other parameters which are later passed to Kf and \u2207Kf. \n\n\nA KernelParameters type can be set using e.g. \nPolynomialKP()\n or \nPolynomialKP(X::Matrix{Float64})\n. The two forms are provided for consistency. \n\n\nsource\n\n\n#\n\n\nCoupledFields.GaussianKP\n \n \nType\n.\n\n\nGaussianKP: For the gaussian kernel\n\n\n\n\nsource\n\n\n#\n\n\nCoupledFields.PolynomialKP\n \n \nType\n.\n\n\nPolynomialKP: For the polynomial kernel\n\n\n\n\nsource\n\n\n\n\nFunctions\n\n\n#\n\n\nCoupledFields.bf\n \n \nMethod\n.\n\n\nbf(x::Vector{Float64}, df::Int):\n\n\n\n\nCompute a piecewise linear basis matrix for the vector x.\n\n\nsource\n\n\n#\n\n\nCoupledFields.cca\n \n \nMethod\n.\n\n\ncca{T\n:Matrix{Float64}}(v::Array{Float64}, X::T,Y::T):\n\n\n\n\nRegularized Canonical Correlation Analysis using SVD. \n\n\nsource\n\n\n#\n\n\nCoupledFields.gKCCA\n \n \nMethod\n.\n\n\ngKCCA(par::Array{Float64}, X::Matrix{Float64}, Y::Matrix{Float64}, kpars::KernelParameters):\n\n\n\n\nCompute the projection matrices and components for gKCCA.\n\n\nsource\n\n\n#\n\n\nCoupledFields.gradvecfield\n \n \nMethod\n.\n\n\ngradvecfield{N\n:Float64, T\n:Matrix{Float64}}(par::Array{N}, X::T, Y::T, kpars::KernelParameters ):\n\n\n\n\nCompute the gradient vector or gradient matrix at each instance of the \nX\n and \nY\n fields, by making use of a kernel feature space.\n\n\nsource\n\n\n#\n\n\nCoupledFields.whiten\n \n \nMethod\n.\n\n\nwhiten(x::Matrix{Float64}, d::Float64; lat=nothing): Whiten matrix\n\n\n\n\nd\n (0-1) Percentage variance of components to retain. \n\n\nlat\n Latitudinal area-weighting.\n\n\nsource", 
+            "title": "Library"
+        }, 
+        {
+            "location": "/lib/library/#library", 
+            "text": "", 
+            "title": "Library"
+        }, 
+        {
+            "location": "/lib/library/#contents", 
+            "text": "Library  Contents  Types  Functions", 
+            "title": "Contents"
+        }, 
+        {
+            "location": "/lib/library/#types", 
+            "text": "#  CoupledFields.InputSpace     Type .  InputSpace: A type to hold the `X` and `Y` fields of the Input space  InputSpace(X, Y, d, lat): The fields are whitened if  d=[d1, d2]  is supplied. Area weighting is applied if  lat  is supplied.        source  #  CoupledFields.ModelObj     Type .  ModelObj: A type to hold statistical model results  Such as the matrices  W, R, A, T , where  R=XW  and  T=YA .    source  #  CoupledFields.KernelParameters     Type .  KernelParameters: An abstract type.  All KernelParameters types contain Kf and \u2207Kf i.e. a kernel function and its first derivative. Some instances also contain other parameters which are later passed to Kf and \u2207Kf.   A KernelParameters type can be set using e.g.  PolynomialKP()  or  PolynomialKP(X::Matrix{Float64}) . The two forms are provided for consistency.   source  #  CoupledFields.GaussianKP     Type .  GaussianKP: For the gaussian kernel  source  #  CoupledFields.PolynomialKP     Type .  PolynomialKP: For the polynomial kernel  source", 
+            "title": "Types"
+        }, 
+        {
+            "location": "/lib/library/#functions", 
+            "text": "#  CoupledFields.bf     Method .  bf(x::Vector{Float64}, df::Int):  Compute a piecewise linear basis matrix for the vector x.  source  #  CoupledFields.cca     Method .  cca{T :Matrix{Float64}}(v::Array{Float64}, X::T,Y::T):  Regularized Canonical Correlation Analysis using SVD.   source  #  CoupledFields.gKCCA     Method .  gKCCA(par::Array{Float64}, X::Matrix{Float64}, Y::Matrix{Float64}, kpars::KernelParameters):  Compute the projection matrices and components for gKCCA.  source  #  CoupledFields.gradvecfield     Method .  gradvecfield{N :Float64, T :Matrix{Float64}}(par::Array{N}, X::T, Y::T, kpars::KernelParameters ):  Compute the gradient vector or gradient matrix at each instance of the  X  and  Y  fields, by making use of a kernel feature space.  source  #  CoupledFields.whiten     Method .  whiten(x::Matrix{Float64}, d::Float64; lat=nothing): Whiten matrix  d  (0-1) Percentage variance of components to retain.   lat  Latitudinal area-weighting.  source", 
+            "title": "Functions"
+        }
+    ]
+}
