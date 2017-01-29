@@ -1,11 +1,13 @@
 
 #==========================================================================
- Functions from Julia package MLKernels
+ Functions from Julia package MLKernels.jl
  Unfortunately MLKernels hasn't been updated yet to Julia 0.5
- Hence I've borrowed some functions from MLKernels here
+ Hence I've borrowed (and modified) some functions from MLKernels here
 ==========================================================================#
 
-export kernelmatrix, SquaredDistanceKernel, PolynomialKernel
+export Kernel
+export kernelmatrix, SquaredDistanceKernel, PolynomialKernel, LinearKernel
+export GaussianKernel
 
 abstract Kernel{T}
 
@@ -23,6 +25,7 @@ abstract AdditiveKernel{T<:AbstractFloat} <: BaseKernel{T}
 abstract SeparableKernel{T<:AbstractFloat} <: AdditiveKernel{T}
 
 phi{T<:AbstractFloat}(κ::SeparableKernel{T}, x::T, y::T) = phi(κ,x) * phi(κ,y)
+isnonnegative(κ::Kernel) = kernelrange(κ) == :Rp
 
 
 #==========================================================================
@@ -47,6 +50,9 @@ function SquaredDistanceKernel{T<:AbstractFloat}(t::T = 1.0)
             end
     SquaredDistanceKernel{T,CASE}(t)
 end
+
+isnegdef(::SquaredDistanceKernel) = true
+kernelrange(::SquaredDistanceKernel) = :Rp
 
 @inline phi{T<:AbstractFloat}(κ::SquaredDistanceKernel{T,:t1}, x::Vector{T}, y::Vector{T}) = sumabs2(x-y)
 @inline phi{T<:AbstractFloat}(κ::SquaredDistanceKernel{T,:t0p5}, x::Vector{T}, y::Vector{T}) = sumabs(x-y)
@@ -93,11 +99,49 @@ end
 
 PolynomialKernel{T<:AbstractFloat}(κ::BaseKernel{T}, α::T = one(T), c::T = one(T), d::T = convert(T, 2)) = PolynomialKernel{T, d == 1 ? :d1 : :Ø}(κ, α, c, d)
 PolynomialKernel{T<:AbstractFloat}(α::T = 1.0, c::T = one(T), d::T = convert(T, 2)) = PolynomialKernel(convert(Kernel{T},ScalarProductKernel()), α, c, d)
+LinearKernel{T<:AbstractFloat}(α::T = 1.0, c::T = one(T)) = PolynomialKernel(ScalarProductKernel(), α, c, one(T))
 
 
 @inline phi{T<:AbstractFloat}(κ::PolynomialKernel{T}, x::Vector{T}, y::Vector{T}) = (κ.alpha*dot(x,y) + κ.c)^κ.d
 @inline phi{T<:AbstractFloat}(κ::PolynomialKernel{T,:d1}, x::Vector{T}, y::Vector{T}) = κ.alpha*dot(x,y) + κ.c
 
+#==========================================================================
+  Exponential Kernel
+==========================================================================#
+
+immutable ExponentialKernel{T<:AbstractFloat,CASE} <: CompositeKernel{T}
+    k::BaseKernel{T}
+    alpha::T
+    gamma::T
+    function ExponentialKernel(κ::BaseKernel{T}, α::T, γ::T)
+        isnegdef(κ) == true || error("Composed kernel must be negative definite.")
+        isnonnegative(κ) || error("Composed kernel must attain only non-negative values.")
+        α > 0 || error("α = $(α) must be greater than zero.")
+        0 < γ <= 1 || error("γ = $(γ) must be in the interval (0,1].")
+        if CASE == :γ1 &&  γ != 1
+            error("Special case γ = 1 flagged but γ = $(γ)")
+        end
+        new(κ, α, γ)
+    end
+end
+function ExponentialKernel{T<:AbstractFloat}(κ::BaseKernel{T}, α::T = one(T), γ::T = one(T))
+    ExponentialKernel{T, γ == 1 ? :γ1 : :Ø}(κ, α, γ)
+end
+function ExponentialKernel{T<:AbstractFloat}(α::T = 1.0, γ::T = one(T))
+    ExponentialKernel(convert(Kernel{T}, SquaredDistanceKernel()), α, γ)
+end
+
+GaussianKernel{T<:AbstractFloat}(α::T = 1.0) = ExponentialKernel(SquaredDistanceKernel(one(T)), α)
+RadialBasisKernel{T<:AbstractFloat}(α::T = 1.0) = ExponentialKernel(SquaredDistanceKernel(one(T)),α)
+LaplacianKernel{T<:AbstractFloat}(α::T = 1.0) = ExponentialKernel(SquaredDistanceKernel(one(T)),α, convert(T, 0.5))
+
+
+function convert{T<:AbstractFloat}(::Type{ExponentialKernel{T}}, κ::ExponentialKernel)
+    ExponentialKernel(convert(Kernel{T}, κ.k), convert(T, κ.alpha), convert(T, κ.gamma))
+end
+
+@inline phi{T<:AbstractFloat}(κ::ExponentialKernel{T}, x::Vector{T}, y::Vector{T}) = exp(-κ.alpha * sumabs2(x-y)^κ.gamma)
+@inline phi{T<:AbstractFloat}(κ::ExponentialKernel{T,:γ1}, x::Vector{T}, y::Vector{T}) = exp(-κ.alpha * sumabs2(x-y))
 
 
 #==========================================================================
