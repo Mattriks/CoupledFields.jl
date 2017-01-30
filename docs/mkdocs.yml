@@ -25,4 +25,5 @@ pages:
   - Guide:
     - Example 1: 'man/Example1.md'
     - Example 2: 'man/Example2.md'
+    - Tropical Pacific SSTs: 'man/tpSST.md'
   - Library: 'lib/library.md'
