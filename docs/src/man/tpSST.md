@@ -94,8 +94,7 @@ D4map = vcat([fnmap(j, gKCCAm, Z0, r1) for j in 1:2]...)
 
 # Figure 4
 
-# _j = "<sub>j</sub>"
-_j = "ⱼ"
+ _j = "<sub>j</sub>"
 labela = ["<b>XW</b>"*_j, "<b>YA</b>"*_j]
 labelb = [string("<i>r</i>(",labela[1],", <b>X</b>)"), string("<i>r</i>(",labela[2],", <b>Y</b>)")]
 labelc = ["Longitude (°E)", "Latitude (°N)"]
