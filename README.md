@@ -14,6 +14,9 @@ Pkg.build("CoupledFields")
 
 ## Documentation
 
-[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://Mattriks.github.io/CoupledFields/latest)
+- [**LATEST**][docs-latest-url]
 
+
+[docs-latest-url]: https://Mattriks.github.io/CoupledFields/latest
+[docs-stable-url]: https://Mattriks.github.io/CoupledFields/stable
 
