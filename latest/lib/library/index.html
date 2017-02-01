@@ -158,14 +158,14 @@
 </code></pre>
 
 <p>InputSpace(X, Y, d, lat): The fields are whitened if <code>d=[d1, d2]</code> is supplied. Area weighting is applied if <code>lat</code> is supplied.      </p>
-<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/cbc125a80daed885b26f430dd6f8ffa9c08f0233/src/CoupledFields.jl#L89-L93' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/c227a4872b0e72e72a9407e35759fc3ff255466e/src/CoupledFields.jl#L89-L93' class='documenter-source'>source</a><br></p>
 <p><a id='CoupledFields.ModelObj' href='#CoupledFields.ModelObj'>#</a>
 <strong><code>CoupledFields.ModelObj</code></strong> &mdash; <em>Type</em>.</p>
 <pre><code>ModelObj: A type to hold statistical model results
 </code></pre>
 
 <p>Such as the matrices <code>W, R, A, T</code>, where <code>R=XW</code> and <code>T=YA</code>.  </p>
-<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/cbc125a80daed885b26f430dd6f8ffa9c08f0233/src/CoupledFields.jl#L73-L76' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/c227a4872b0e72e72a9407e35759fc3ff255466e/src/CoupledFields.jl#L73-L76' class='documenter-source'>source</a><br></p>
 <p><a id='CoupledFields.KernelParameters' href='#CoupledFields.KernelParameters'>#</a>
 <strong><code>CoupledFields.KernelParameters</code></strong> &mdash; <em>Type</em>.</p>
 <pre><code>KernelParameters: An abstract type.
@@ -173,19 +173,19 @@
 
 <p>All KernelParameters types contain certain parameters which are later passed to internal functions <code>Kf</code> and <code>∇Kf</code>. </p>
 <p>A KernelParameters type is set using e.g. <code>PolynomialKP(X::Matrix{Float64})</code> or <code>GaussianKP(X::Matrix{Float64})</code>. </p>
-<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/cbc125a80daed885b26f430dd6f8ffa9c08f0233/src/CoupledFields.jl#L12-L17' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/c227a4872b0e72e72a9407e35759fc3ff255466e/src/CoupledFields.jl#L12-L17' class='documenter-source'>source</a><br></p>
 <p><a id='CoupledFields.GaussianKP' href='#CoupledFields.GaussianKP'>#</a>
 <strong><code>CoupledFields.GaussianKP</code></strong> &mdash; <em>Type</em>.</p>
 <pre><code>GaussianKP: For the gaussian kernel
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/cbc125a80daed885b26f430dd6f8ffa9c08f0233/src/CoupledFields.jl#L19-L21' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/c227a4872b0e72e72a9407e35759fc3ff255466e/src/CoupledFields.jl#L19-L21' class='documenter-source'>source</a><br></p>
 <p><a id='CoupledFields.PolynomialKP' href='#CoupledFields.PolynomialKP'>#</a>
 <strong><code>CoupledFields.PolynomialKP</code></strong> &mdash; <em>Type</em>.</p>
 <pre><code>PolynomialKP: For the polynomial kernel
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/cbc125a80daed885b26f430dd6f8ffa9c08f0233/src/CoupledFields.jl#L48-L50' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/c227a4872b0e72e72a9407e35759fc3ff255466e/src/CoupledFields.jl#L48-L50' class='documenter-source'>source</a><br></p>
 <p><a id='Functions-1'></a></p>
 <h2 id="functions">Functions</h2>
 <p><a id='CoupledFields.CVfn-Tuple{T<:Array{Float64,2},T<:Array{Float64,2},T<:Array{Float64,2},Function,DataType}' href='#CoupledFields.CVfn-Tuple{T<:Array{Float64,2},T<:Array{Float64,2},T<:Array{Float64,2},Function,DataType}'>#</a>
@@ -194,42 +194,42 @@
 </code></pre>
 
 <p>Cross-validation function</p>
-<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/cbc125a80daed885b26f430dd6f8ffa9c08f0233/src/CoupledFields.jl#L220-L223' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/c227a4872b0e72e72a9407e35759fc3ff255466e/src/CoupledFields.jl#L220-L223' class='documenter-source'>source</a><br></p>
 <p><a id='CoupledFields.Rsq_adj-Tuple{T<:Array{Float64,N},T<:Array{Float64,N},Int64}' href='#CoupledFields.Rsq_adj-Tuple{T<:Array{Float64,N},T<:Array{Float64,N},Int64}'>#</a>
 <strong><code>CoupledFields.Rsq_adj</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>Rsq_adj{T&lt;:Array{Float64}}(Tx::T, Ty::T, df::Int):
 </code></pre>
 
 <p>Cross-validation metric</p>
-<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/cbc125a80daed885b26f430dd6f8ffa9c08f0233/src/CoupledFields.jl#L278-L281' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/c227a4872b0e72e72a9407e35759fc3ff255466e/src/CoupledFields.jl#L278-L281' class='documenter-source'>source</a><br></p>
 <p><a id='CoupledFields.bf-Tuple{Array{Float64,1},Int64}' href='#CoupledFields.bf-Tuple{Array{Float64,1},Int64}'>#</a>
 <strong><code>CoupledFields.bf</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>bf(x::Vector{Float64}, df::Int):
 </code></pre>
 
 <p>Compute a piecewise linear basis matrix for the vector x.</p>
-<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/cbc125a80daed885b26f430dd6f8ffa9c08f0233/src/CoupledFields.jl#L124-L127' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/c227a4872b0e72e72a9407e35759fc3ff255466e/src/CoupledFields.jl#L124-L127' class='documenter-source'>source</a><br></p>
 <p><a id='CoupledFields.cca-Tuple{Array{Float64,N},T<:Array{Float64,2},T<:Array{Float64,2}}' href='#CoupledFields.cca-Tuple{Array{Float64,N},T<:Array{Float64,2},T<:Array{Float64,2}}'>#</a>
 <strong><code>CoupledFields.cca</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>cca{T&lt;:Matrix{Float64}}(v::Array{Float64}, X::T,Y::T):
 </code></pre>
 
 <p>Regularized Canonical Correlation Analysis using SVD. </p>
-<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/cbc125a80daed885b26f430dd6f8ffa9c08f0233/src/CoupledFields.jl#L143-L146' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/c227a4872b0e72e72a9407e35759fc3ff255466e/src/CoupledFields.jl#L143-L146' class='documenter-source'>source</a><br></p>
 <p><a id='CoupledFields.gKCCA-Tuple{Array{Float64,N},Array{Float64,2},Array{Float64,2},CoupledFields.KernelParameters}' href='#CoupledFields.gKCCA-Tuple{Array{Float64,N},Array{Float64,2},Array{Float64,2},CoupledFields.KernelParameters}'>#</a>
 <strong><code>CoupledFields.gKCCA</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>gKCCA(par::Array{Float64}, X::Matrix{Float64}, Y::Matrix{Float64}, kpars::KernelParameters):
 </code></pre>
 
 <p>Compute the projection matrices and components for gKCCA.</p>
-<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/cbc125a80daed885b26f430dd6f8ffa9c08f0233/src/CoupledFields.jl#L173-L176' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/c227a4872b0e72e72a9407e35759fc3ff255466e/src/CoupledFields.jl#L173-L176' class='documenter-source'>source</a><br></p>
 <p><a id='CoupledFields.gradvecfield-Tuple{Array{N<:Float64,N},T<:Array{Float64,2},T<:Array{Float64,2},CoupledFields.KernelParameters}' href='#CoupledFields.gradvecfield-Tuple{Array{N<:Float64,N},T<:Array{Float64,2},T<:Array{Float64,2},CoupledFields.KernelParameters}'>#</a>
 <strong><code>CoupledFields.gradvecfield</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>gradvecfield{N&lt;:Float64, T&lt;:Matrix{Float64}}(par::Array{N}, X::T, Y::T, kpars::KernelParameters ):
 </code></pre>
 
 <p>Compute the gradient vector or gradient matrix at each instance of the <code>X</code> and <code>Y</code> fields, by making use of a kernel feature space.</p>
-<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/cbc125a80daed885b26f430dd6f8ffa9c08f0233/src/CoupledFields.jl#L110-L113' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/c227a4872b0e72e72a9407e35759fc3ff255466e/src/CoupledFields.jl#L110-L113' class='documenter-source'>source</a><br></p>
 <p><a id='CoupledFields.whiten-Tuple{Array{Float64,2},Float64}' href='#CoupledFields.whiten-Tuple{Array{Float64,2},Float64}'>#</a>
 <strong><code>CoupledFields.whiten</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>whiten(x::Matrix{Float64}, d::Float64; lat=nothing): Whiten matrix
@@ -237,7 +237,7 @@
 
 <p><code>d</code> (0-1) Percentage variance of components to retain. </p>
 <p><code>lat</code> Latitudinal area-weighting.</p>
-<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/cbc125a80daed885b26f430dd6f8ffa9c08f0233/src/CoupledFields.jl#L202-L207' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/Mattriks/CoupledFields/tree/c227a4872b0e72e72a9407e35759fc3ff255466e/src/CoupledFields.jl#L202-L207' class='documenter-source'>source</a><br></p>
               
             </div>
           </div>
