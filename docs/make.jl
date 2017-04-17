@@ -6,6 +6,6 @@ makedocs(
 
 deploydocs(
     deps   = Deps.pip("mkdocs", "python-markdown-math"),
-    repo   = "github.com/Mattriks/CoupledFields.git",
+    repo   = "github.com/Mattriks/CoupledFields.jl.git",
     julia  = "release"
 )

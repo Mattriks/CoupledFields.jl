@@ -1,4 +1,4 @@
-# CoupledFields
+# CoupledFields.jl
 
 ## Summary
 
@@ -8,7 +8,7 @@ The main function `gradvecfield` calculates the gradient vector or gradient matr
 ## Installation
 
 ```julia
-Pkg.clone("https://github.com/Mattriks/CoupledFields")
+Pkg.clone("https://github.com/Mattriks/CoupledFields.jl")
 Pkg.build("CoupledFields")
 ```
 
@@ -17,6 +17,6 @@ Pkg.build("CoupledFields")
 - [**LATEST**][docs-latest-url]
 
 
-[docs-latest-url]: https://Mattriks.github.io/CoupledFields/latest
-[docs-stable-url]: https://Mattriks.github.io/CoupledFields/stable
+[docs-latest-url]: https://Mattriks.github.io/CoupledFields.jl/latest
+[docs-stable-url]: https://Mattriks.github.io/CoupledFields.jl/stable
 
