@@ -1,8 +1,11 @@
 
+
 #==========================================================================
  Functions from Julia package MLKernels.jl
- Unfortunately MLKernels hasn't been updated yet to Julia 0.5
- Hence I've borrowed (and modified) some functions from MLKernels here
+ Unfortunately MLKernels hasn't tagged a new release for a while
+ Hence I've borrowed (and modified) some functions from an earlier vesion
+ of MLKernels here, see
+  https://github.com/trthatcher/MLKernels.jl/blob/master/LICENSE.md
 ==========================================================================#
 
 export Kernel
@@ -159,7 +162,6 @@ end
 function kernelmatrix{T<:AbstractFloat}(κ::Kernel{T}, X::Matrix{T}, Y::Matrix{T}, is_trans::Bool = false)
     kernelmatrix!(init_pairwise(X, Y, is_trans), κ, X, Y, is_trans)
 end
-# kernelmatrix{T<:AbstractFloat}(κ::Kernel{T}, X::Matrix{T}, Y::Matrix{T}; is_trans::Bool = false) = kernelmatrix(κ, X, Y, is_trans)
 
 
 #==========================================================================
