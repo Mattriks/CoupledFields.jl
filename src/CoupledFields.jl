@@ -1,5 +1,6 @@
 module CoupledFields
 
+using Compat
 using StatsBase: zscore, sample
 export InputSpace, ModelObj
 export KernelParameters, GaussianKP, PolynomialKP
@@ -14,7 +15,7 @@ include("MLKernels.jl")
 All KernelParameters types contain certain parameters which are later passed to internal functions `Kf` and `∇Kf`. \n
 A KernelParameters type is set using e.g. `PolynomialKP(X::Matrix{Float64})` or `GaussianKP(X::Matrix{Float64})`. 
 """
-abstract KernelParameters
+@compat abstract type KernelParameters end
 
 """
     GaussianKP: For the gaussian kernel
@@ -33,7 +34,7 @@ end
 
     function Kf{T<:Float64}(par::Array{T}, X::Matrix{T}, kpars::GaussianKP)
         sx2 = 2*par[1]*par[1]*kpars.varx
-        return exp(-kpars.xx/sx2)
+        return exp.(-kpars.xx/sx2)
     end
 
     function ∇Kf{T<:Float64}(par::Array{T}, X::Matrix{T}, kpars::GaussianKP)
@@ -210,7 +211,7 @@ function whiten(X::Matrix{Float64}, d::Float64; lat=nothing)
         scale!(m1, 1.0./sqrt(cos(pi*lat/180)) )
     end
     sv = svdfact(m1)
-    l = cumsum(sv[:S].^2)/sumabs2(sv[:S])
+    l = cumsum(sv[:S].^2)/sum(abs2, sv[:S])
     U = sv[:U][:, l.≤d]
     U /= std(U[:,1])
     return U
