@@ -254,9 +254,9 @@ function CVfn{T<:Matrix{Float64}}(parm::T, X::T, Y::T, modelfn::Function, kernel
     # Main loop
     
     for i in 1:nrg
-        percent = round(100*i/nrg)
+        percent = round(Int, 100*i/nrg)
         if verbose
-           @printf " %03d%%" percent
+           print(string(percent,"% ")) 
         end
         par = parm[i,:]
         model1 = modelfn(par, X1train, Y1train, k1pars)
