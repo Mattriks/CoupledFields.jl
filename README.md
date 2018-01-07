@@ -7,9 +7,9 @@ The main function `gradvecfield` calculates the gradient vector or gradient matr
 
 ## Installation
 
+Within Julia:
 ```julia
-Pkg.clone("https://github.com/Mattriks/CoupledFields.jl")
-Pkg.build("CoupledFields")
+julia> Pkg.add("CoupledFields")
 ```
 
 ## Documentation
