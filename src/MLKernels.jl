@@ -13,11 +13,10 @@ export Kernel
 export kernelmatrix, SquaredDistanceKernel, PolynomialKernel, LinearKernel
 export GaussianKernel
 
-@compat abstract type Kernel{T} end
-
-@compat abstract type StandardKernel{T<:AbstractFloat} <: Kernel{T} end
-@compat abstract type BaseKernel{T<:AbstractFloat} <: StandardKernel{T} end
-@compat abstract type CompositeKernel{T<:AbstractFloat} <: StandardKernel{T} end
+abstract type Kernel{T} end
+abstract type StandardKernel{T<:AbstractFloat} <: Kernel{T} end
+abstract type BaseKernel{T<:AbstractFloat} <: StandardKernel{T} end
+abstract type CompositeKernel{T<:AbstractFloat} <: StandardKernel{T} end
 
 
 #==========================================================================
@@ -25,10 +24,10 @@ export GaussianKernel
   Separable Kernel: k(x,y) = k(x)k(y)    x ∈ ℝ, y ∈ ℝ
 ==========================================================================#
 
-@compat abstract type AdditiveKernel{T<:AbstractFloat} <: BaseKernel{T} end
-@compat abstract type SeparableKernel{T<:AbstractFloat} <: AdditiveKernel{T} end
+abstract type AdditiveKernel{T<:AbstractFloat} <: BaseKernel{T} end
+abstract type SeparableKernel{T<:AbstractFloat} <: AdditiveKernel{T} end
 
-phi{T<:AbstractFloat}(κ::SeparableKernel{T}, x::T, y::T) = phi(κ,x) * phi(κ,y)
+phi(κ::SeparableKernel{T}, x::T, y::T) where {T<:AbstractFloat} = phi(κ,x) * phi(κ,y)
 isnonnegative(κ::Kernel) = kernelrange(κ) == :Rp
 
 
@@ -37,15 +36,15 @@ isnonnegative(κ::Kernel) = kernelrange(κ) == :Rp
   k(x,y) = (x-y)²ᵗ    x ∈ ℝ, y ∈ ℝ, t ∈ (0,1]
 ==========================================================================#
 
-immutable SquaredDistanceKernel{T<:AbstractFloat,CASE} <: AdditiveKernel{T} 
+struct SquaredDistanceKernel{T<:AbstractFloat,CASE} <: AdditiveKernel{T} 
     t::T
-    function (::Type{SquaredDistanceKernel{T,CASE}}){T,CASE}(t::T)
+    function (::Type{SquaredDistanceKernel{T,CASE}})(t::T) where {T,CASE}
         0 < t <= 1 || error("Parameter t = $(t) must be in range (0,1]")
         new{T,CASE}(t)
     end
 end
 
-function SquaredDistanceKernel{T<:AbstractFloat}(t::T = 1.0)
+function SquaredDistanceKernel(t::T = 1.0) where {T<:AbstractFloat}
     CASE =  if t == 1
                 :t1
             elseif t == 0.5
@@ -59,9 +58,9 @@ end
 isnegdef(::SquaredDistanceKernel) = true
 kernelrange(::SquaredDistanceKernel) = :Rp
 
-phi{T<:AbstractFloat}(κ::SquaredDistanceKernel{T,:t1}, x::Vector{T}, y::Vector{T}) = sum(abs2, x-y)
-phi{T<:AbstractFloat}(κ::SquaredDistanceKernel{T,:t0p5}, x::Vector{T}, y::Vector{T}) = sum(abs, x-y)
-phi{T<:AbstractFloat}(κ::SquaredDistanceKernel{T}, x::Vector{T}, y::Vector{T}) = sum(abs2, x-y)^κ.t
+phi(κ::SquaredDistanceKernel{T,:t1}, x::Vector{T}, y::Vector{T}) where {T<:AbstractFloat} = sum(abs2, x-y)
+phi(κ::SquaredDistanceKernel{T,:t0p5}, x::Vector{T}, y::Vector{T}) where {T<:AbstractFloat} = sum(abs, x-y)
+phi(κ::SquaredDistanceKernel{T}, x::Vector{T}, y::Vector{T}) where {T<:AbstractFloat} = sum(abs2, x-y)^κ.t
 
 
 #==========================================================================
@@ -69,28 +68,28 @@ phi{T<:AbstractFloat}(κ::SquaredDistanceKernel{T}, x::Vector{T}, y::Vector{T}) 
   (Code preserved for future reasons)
 ==========================================================================#
 
-immutable ScalarProductKernel{T<:AbstractFloat} <: SeparableKernel{T} end
+struct ScalarProductKernel{T<:AbstractFloat} <: SeparableKernel{T} end
 ScalarProductKernel() = ScalarProductKernel{Float64}()
 
 ismercer(::ScalarProductKernel) = true
 
-convert{T<:AbstractFloat}(::Type{ScalarProductKernel{T}}, κ::ScalarProductKernel) = ScalarProductKernel{T}()
+convert(::Type{ScalarProductKernel{T}}, κ::ScalarProductKernel) where {T<:AbstractFloat} = ScalarProductKernel{T}()
 
-phi{T<:AbstractFloat}(κ::ScalarProductKernel{T}, x::T) = x
+phi(κ::ScalarProductKernel{T}, x::T) where {T<:AbstractFloat} = x
 
-convert{T<:AbstractFloat}(::Type{Kernel{T}}, κ::ScalarProductKernel) = convert(ScalarProductKernel{T}, κ)
+convert(::Type{Kernel{T}}, κ::ScalarProductKernel) where {T<:AbstractFloat} = convert(ScalarProductKernel{T}, κ)
 
 
 #==========================================================================
   Polynomial Kernel
 ==========================================================================#
 
-immutable PolynomialKernel{T<:AbstractFloat,CASE} <: CompositeKernel{T}
+struct PolynomialKernel{T<:AbstractFloat,CASE} <: CompositeKernel{T}
     k::BaseKernel{T}
     alpha::T
     c::T
     d::T
-    function (::Type{PolynomialKernel{T,CASE}}){T,CASE}(κ::BaseKernel{T}, α::T, c::T, d::T)
+    function (::Type{PolynomialKernel{T,CASE}})(κ::BaseKernel{T}, α::T, c::T, d::T) where {T,CASE}
         ismercer(κ) == true || error("Composed kernel must be a Mercer kernel.")
         α > 0 || error("α = $(α) must be greater than zero.")
         c >= 0 || error("c = $(c) must be non-negative.")
@@ -102,23 +101,23 @@ immutable PolynomialKernel{T<:AbstractFloat,CASE} <: CompositeKernel{T}
     end
 end
 
-PolynomialKernel{T<:AbstractFloat}(κ::BaseKernel{T}, α::T = one(T), c::T = one(T), d::T = convert(T, 2)) = PolynomialKernel{T, d == 1 ? :d1 : :Ø}(κ, α, c, d)
-PolynomialKernel{T<:AbstractFloat}(α::T = 1.0, c::T = one(T), d::T = convert(T, 2)) = PolynomialKernel(convert(Kernel{T},ScalarProductKernel()), α, c, d)
-LinearKernel{T<:AbstractFloat}(α::T = 1.0, c::T = one(T)) = PolynomialKernel(ScalarProductKernel(), α, c, one(T))
+PolynomialKernel(κ::BaseKernel{T}, α::T = one(T), c::T = one(T), d::T = convert(T, 2)) where {T<:AbstractFloat} = PolynomialKernel{T, d == 1 ? :d1 : :Ø}(κ, α, c, d)
+PolynomialKernel(α::T = 1.0, c::T = one(T), d::T = convert(T, 2)) where {T<:AbstractFloat} = PolynomialKernel(convert(Kernel{T},ScalarProductKernel()), α, c, d)
+LinearKernel(α::T = 1.0, c::T = one(T)) where {T<:AbstractFloat} = PolynomialKernel(ScalarProductKernel(), α, c, one(T))
 
-phi{T<:AbstractFloat}(κ::PolynomialKernel{T}, x::Vector{T}, y::Vector{T}) = (κ.alpha*dot(x,y) + κ.c)^κ.d
-phi{T<:AbstractFloat}(κ::PolynomialKernel{T,:d1}, x::Vector{T}, y::Vector{T}) = κ.alpha*dot(x,y) + κ.c
+phi(κ::PolynomialKernel{T}, x::Vector{T}, y::Vector{T}) where {T<:AbstractFloat} = (κ.alpha*dot(x,y) + κ.c)^κ.d
+phi(κ::PolynomialKernel{T,:d1}, x::Vector{T}, y::Vector{T}) where {T<:AbstractFloat} = κ.alpha*dot(x,y) + κ.c
 
 
 #==========================================================================
   Exponential Kernel
 ==========================================================================#
 
-immutable ExponentialKernel{T<:AbstractFloat,CASE} <: CompositeKernel{T}
+struct ExponentialKernel{T<:AbstractFloat,CASE} <: CompositeKernel{T}
     k::BaseKernel{T}
     alpha::T
     gamma::T
-    function (::Type{ExponentialKernel{T,CASE}}){T,CASE}(κ::BaseKernel{T}, α::T, γ::T)
+    function (::Type{ExponentialKernel{T,CASE}})(κ::BaseKernel{T}, α::T, γ::T) where {T,CASE}
         isnegdef(κ) == true || error("Composed kernel must be negative definite.")
         isnonnegative(κ) || error("Composed kernel must attain only non-negative values.")
         α > 0 || error("α = $(α) must be greater than zero.")
@@ -129,35 +128,35 @@ immutable ExponentialKernel{T<:AbstractFloat,CASE} <: CompositeKernel{T}
         new{T,CASE}(κ, α, γ)
     end
 end
-ExponentialKernel{T<:AbstractFloat}(κ::BaseKernel{T}, α::T = one(T), γ::T = one(T)) = ExponentialKernel{T, γ == 1 ? :γ1 : :Ø}(κ, α, γ)
-ExponentialKernel{T<:AbstractFloat}(α::T = 1.0, γ::T = one(T)) = ExponentialKernel(convert(Kernel{T}, SquaredDistanceKernel()), α, γ)
+ExponentialKernel(κ::BaseKernel{T}, α::T = one(T), γ::T = one(T)) where {T<:AbstractFloat} = ExponentialKernel{T, γ == 1 ? :γ1 : :Ø}(κ, α, γ)
+ExponentialKernel(α::T = 1.0, γ::T = one(T)) where {T<:AbstractFloat} = ExponentialKernel(convert(Kernel{T}, SquaredDistanceKernel()), α, γ)
 
-GaussianKernel{T<:AbstractFloat}(α::T = 1.0) = ExponentialKernel(SquaredDistanceKernel(one(T)), α)
-RadialBasisKernel{T<:AbstractFloat}(α::T = 1.0) = ExponentialKernel(SquaredDistanceKernel(one(T)),α)
-LaplacianKernel{T<:AbstractFloat}(α::T = 1.0) = ExponentialKernel(SquaredDistanceKernel(one(T)),α, convert(T, 0.5))
+GaussianKernel(α::T = 1.0) where {T<:AbstractFloat} = ExponentialKernel(SquaredDistanceKernel(one(T)), α)
+RadialBasisKernel(α::T = 1.0) where {T<:AbstractFloat} = ExponentialKernel(SquaredDistanceKernel(one(T)),α)
+LaplacianKernel(α::T = 1.0) where {T<:AbstractFloat} = ExponentialKernel(SquaredDistanceKernel(one(T)),α, convert(T, 0.5))
 
 
-function convert{T<:AbstractFloat}(::Type{ExponentialKernel{T}}, κ::ExponentialKernel)
+function convert(::Type{ExponentialKernel{T}}, κ::ExponentialKernel) where {T<:AbstractFloat}
     ExponentialKernel(convert(Kernel{T}, κ.k), convert(T, κ.alpha), convert(T, κ.gamma))
 end
 
-phi{T<:AbstractFloat}(κ::ExponentialKernel{T}, x::Vector{T}, y::Vector{T}) = exp.(-κ.alpha * sum(abs2, x-y)^κ.gamma)
-phi{T<:AbstractFloat}(κ::ExponentialKernel{T,:γ1}, x::Vector{T}, y::Vector{T}) = exp.(-κ.alpha * sum(abs2, x-y))
+phi(κ::ExponentialKernel{T}, x::Vector{T}, y::Vector{T}) where {T<:AbstractFloat} = exp.(-κ.alpha * sum(abs2, x-y)^κ.gamma)
+phi(κ::ExponentialKernel{T,:γ1}, x::Vector{T}, y::Vector{T}) where {T<:AbstractFloat} = exp.(-κ.alpha * sum(abs2, x-y))
 
 
 #==========================================================================
   Generic Kernel Matrix Functions
 ==========================================================================#
 
-function init_pairwise{T<:AbstractFloat}(X::Matrix{T}, Y::Matrix{T}, is_trans::Bool)
+function init_pairwise(X::Matrix{T}, Y::Matrix{T}, is_trans::Bool) where {T<:AbstractFloat}
     n_dim = is_trans ? 2 : 1
     n = size(X, n_dim)
     m = size(Y, n_dim)
-    return Array{T}(n, m)
+    return Array{T}(undef, n, m)
 end
 
 
-function kernelmatrix{T<:AbstractFloat}(κ::Kernel{T}, X::Matrix{T}, Y::Matrix{T}, is_trans::Bool = false)
+function kernelmatrix(κ::Kernel{T}, X::Matrix{T}, Y::Matrix{T}, is_trans::Bool = false) where {T<:AbstractFloat}
     kernelmatrix!(init_pairwise(X, Y, is_trans), κ, X, Y, is_trans)
 end
 
@@ -166,11 +165,11 @@ end
   Base and Composite Kernel Matrix Functions
 ==========================================================================#
 
-function kernelmatrix!{T<:AbstractFloat}(K::Matrix{T}, κ::BaseKernel{T}, X::Matrix{T}, Y::Matrix{T}, is_trans::Bool)
+function kernelmatrix!(K::Matrix{T}, κ::BaseKernel{T}, X::Matrix{T}, Y::Matrix{T}, is_trans::Bool) where {T<:AbstractFloat}
     pairwise!(K, κ, X, Y, is_trans)
 end
 
-function kernelmatrix!{T<:AbstractFloat}(K::Matrix{T}, κ::CompositeKernel{T}, X::Matrix{T}, Y::Matrix{T}, is_trans::Bool)
+function kernelmatrix!(K::Matrix{T}, κ::CompositeKernel{T}, X::Matrix{T}, Y::Matrix{T}, is_trans::Bool) where {T<:AbstractFloat}
     pairwise!(K, κ, X, Y, is_trans)
 end
 
@@ -181,14 +180,14 @@ end
 
 # Initiate pairwise matrices
 
-function init_pairwise{T<:AbstractFloat}(X::Matrix{T}, is_trans::Bool)
+function init_pairwise(X::Matrix{T}, is_trans::Bool) where {T<:AbstractFloat}
     n = size(X, is_trans ? 2 : 1)
     Array(T, n, n)
 end
 
 # Pairwise definition
 
-function pairwise!{T<:AbstractFloat}(K::Matrix{T}, κ::Kernel{T}, X::Matrix{T}, Y::Matrix{T}, is_trans::Bool)
+function pairwise!(K::Matrix{T}, κ::Kernel{T}, X::Matrix{T}, Y::Matrix{T}, is_trans::Bool) where {T<:AbstractFloat}
     if is_trans
         pairwise_XtYt!(K, κ, X, Y)
     else
@@ -198,7 +197,7 @@ end
 
 
 
-function pairwise_XY!{T<:AbstractFloat}(K::Matrix{T}, κ::Kernel{T}, X::Matrix{T}, Y::Matrix{T})
+function pairwise_XY!(K::Matrix{T}, κ::Kernel{T}, X::Matrix{T}, Y::Matrix{T}) where {T<:AbstractFloat}
     (n = size(X,1)) == size(K,1) || throw(DimensionMismatch("Dimension 1 of X must match dimension 1 of K."))
     (m = size(Y,1)) == size(K,2) || throw(DimensionMismatch("Dimension 1 of Y must match dimension 2 of K."))
     size(X,2) == size(Y,2) || throw(DimensionMismatch("Dimension 2 of Y must match dimension 2 of X."))
@@ -212,7 +211,7 @@ function pairwise_XY!{T<:AbstractFloat}(K::Matrix{T}, κ::Kernel{T}, X::Matrix{T
 end
 
 
-function pairwise_XtYt!{T<:AbstractFloat}(K::Matrix{T}, κ::Kernel{T}, X::Matrix{T}, Y::Matrix{T})
+function pairwise_XtYt!(K::Matrix{T}, κ::Kernel{T}, X::Matrix{T}, Y::Matrix{T}) where {T<:AbstractFloat}
     (n = size(X,2)) == size(K,1) || throw(DimensionMismatch("Dimension 2 of X must match dimension 1 of K."))
     (m = size(Y,2)) == size(K,2) || throw(DimensionMismatch("Dimension 2 of Y must match dimension 2 of K."))
     size(X,1) == size(Y,1) || throw(DimensionMismatch("Dimension 1 of Y must match dimension 1 of X."))
