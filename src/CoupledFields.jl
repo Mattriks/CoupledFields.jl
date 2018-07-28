@@ -1,7 +1,8 @@
 module CoupledFields
 
 using Compat.LinearAlgebra
-using Compat: undef
+using Compat.Statistics
+using Compat: undef, reverse
 using StatsBase
 export InputSpace, ModelObj
 export KernelParameters, GaussianKP, PolynomialKP

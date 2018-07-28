@@ -15,7 +15,7 @@ function simfields(t::Vector{Float64}, p::Int64, σₑ::Float64)
 end
 
 
-t1 = collect((1950+1/24):(1/12):2015)
+t1 = collect((2001+1/24):(1/12):2015)
 lpfield, hpfield = simfields(t1, 10, 1.0)
 Z = InputSpace(lpfield, hpfield, [1.1,1.1])
 kpars = GaussianKP(Z.X)
