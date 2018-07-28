@@ -1,9 +1,9 @@
 module CoupledFields
 
+using Compat
 using Compat.LinearAlgebra
 using Compat.Statistics
-using Compat: undef, reverse
-using StatsBase
+using StatsBase: zscore
 export InputSpace, ModelObj
 export KernelParameters, GaussianKP, PolynomialKP
 export gradvecfield
@@ -29,7 +29,7 @@ end
 
 function GaussianKP(X::Matrix{Float64})
     xx = kernelmatrix(SquaredDistanceKernel(1.0), X, X)
-    varx = median(xx[xx.>10.0^-9])
+    varx = Statistics.median(xx[xx.>10.0^-9])
     return GaussianKP(xx, varx)    
 end
 
@@ -129,7 +129,7 @@ Compute a piecewise linear basis matrix for the vector x.
 """
 function bf(x::Vector{Float64}, df::Int)
     if df<2 return x[:,1:1] end
-    bp = quantile(x, range(0, stop=1, length=df+1))
+    bp = Statistics.quantile(x, Compat.range(0, stop=1, length=df+1))
     n = length(x)
     a1 = repeat(x, inner=(1,df)) 
     a2 = repeat( bp[1:df]', inner=(n,1)) 
@@ -150,9 +150,9 @@ function cca(v::Array{Float64}, X::T,Y::T) where T<:Matrix{Float64}
 #    n,p = size(X)
     q = size(Y)[2]
     
-    Cxx_fac_inv = (cov(X)+(10.0^v[1])*I)^-0.5
-    Cyy_fac_inv = (q>1) ? (cov(Y)+(10.0^v[2])*I)^-0.5 : cov(Y)^(-0.5)
-    M = cov(X*Cxx_fac_inv, Y*Cyy_fac_inv)
+    Cxx_fac_inv = (Statistics.cov(X)+(10.0^v[1])*I)^-0.5
+    Cyy_fac_inv = (q>1) ? (Statistics.cov(Y)+(10.0^v[2])*I)^-0.5 : Statistics.cov(Y)^(-0.5)
+    M = Statistics.cov(X*Cxx_fac_inv, Y*Cyy_fac_inv)
     U, D, V = svd(M)
 
     Wx = Cxx_fac_inv * U
@@ -178,7 +178,7 @@ function gKCCA(par::Array{Float64}, X::Matrix{Float64}, Y::Matrix{Float64}, kpar
     ∇g = gradvecfield(par, X, Y, kpars)
     M = mapreduce(x -> x*x', +, ∇g)/n
     values, vectors = eig(Symmetric(M))
-    Wx = reverse(vectors, dims=2)
+    Wx = Compat.reverse(vectors, dims=2)
     R = X * Wx
     
     dmin = minimum([p q 3])
@@ -210,7 +210,7 @@ function whiten(X::Matrix{Float64}, d::Float64; lat=nothing)
     U,S,V = svd(m1)
     l = cumsum(S.^2)/sum(abs2, S)
     U = U[:, l.≤d]
-    U /= std(U[:,1])
+    U /= Statistics.std(U[:,1])
     return U
 end 
 
