@@ -1,9 +1,8 @@
 module CoupledFields
 
-using Compat
-using Compat.LinearAlgebra
-using Compat.Statistics
-using StatsBase: zscore
+using LinearAlgebra
+using Statistics
+using StatsBase: sample, zscore
 export InputSpace, ModelObj
 export KernelParameters, GaussianKP, PolynomialKP
 export gradvecfield
@@ -129,14 +128,15 @@ Compute a piecewise linear basis matrix for the vector x.
 """
 function bf(x::Vector{Float64}, df::Int)
     if df<2 return x[:,1:1] end
-    bp = Statistics.quantile(x, Compat.range(0, stop=1, length=df+1))
+    bp = Statistics.quantile(x, range(0, stop=1, length=df+1))
     n = length(x)
     a1 = repeat(x, inner=(1,df)) 
-    a2 = repeat( bp[1:df]', inner=(n,1)) 
+    a2 = repeat( permutedims(bp[1:df]), inner=(n,1)) 
       
     for j in 1:df
-        ix1 = x.<bp[j]; a1[ix1,j] .= bp[j] 
-        ix2 = x.>bp[j+1]; a1[ix2,j] .= bp[j+1] 
+        ix1, ix2 = x.<bp[j], x.>bp[j+1] 
+        a1[ix1,j] .= bp[j] 
+        a1[ix2,j] .= bp[j+1] 
     end
         
     return a1-a2 
@@ -148,7 +148,7 @@ Regularized Canonical Correlation Analysis using SVD.
 """
 function cca(v::Array{Float64}, X::T,Y::T) where T<:Matrix{Float64}
 #    n,p = size(X)
-    q = size(Y)[2]
+    q = size(Y, 2)
     
     Cxx_fac_inv = (Statistics.cov(X)+(10.0^v[1])*I)^-0.5
     Cyy_fac_inv = (q>1) ? (Statistics.cov(Y)+(10.0^v[2])*I)^-0.5 : Statistics.cov(Y)^(-0.5)
@@ -177,8 +177,8 @@ function gKCCA(par::Array{Float64}, X::Matrix{Float64}, Y::Matrix{Float64}, kpar
     n, p = size(X)
     ∇g = gradvecfield(par, X, Y, kpars)
     M = mapreduce(x -> x*x', +, ∇g)/n
-    values, vectors = eig(Symmetric(M))
-    Wx = Compat.reverse(vectors, dims=2)
+    values, vectors = eigen(Symmetric(M))
+    Wx = reverse(vectors, dims=2)
     R = X * Wx
     
     dmin = minimum([p q 3])
@@ -203,16 +203,14 @@ end
 `lat` Latitudinal area-weighting.
 """
 function whiten(X::Matrix{Float64}, d::Float64; lat=nothing)
-    m1 = zscore(X,1)
-    if lat != nothing
-        scale!(m1, 1.0./sqrt(cos(pi*lat/180)) )
-    end
+    m1 = zscore(X, 1)
+#    lat != nothing && scale!(m1, 1.0./sqrt(cos(pi*lat/180)) )
     U,S,V = svd(m1)
     l = cumsum(S.^2)/sum(abs2, S)
     U = U[:, l.≤d]
-    U /= Statistics.std(U[:,1])
+    U ./= Statistics.std(U, dims=1)
     return U
-end 
+end
 
 
 """
@@ -228,22 +226,22 @@ function CVfn(parm::T, X::T, Y::T, modelfn::Function, kerneltype::DataType; verb
     # other params
     nrg = size(parm, 1)
     pargrid = Float64[parm zeros(nrg)]
-    n, p = size(X)    
+    n, p = size(X)
      
     # Setup
     yr = div(0:n-1,12)+1
     yrs = unique(yr)
-    ta = findin(yr, sample(yrs,div(length(yrs),2)+1,replace=false,ordered=true))
+    ta = findall(in(sample(yrs, div(length(yrs),2)+1, replace=false, ordered=true)), yr)
     tb = setdiff(1:n,ta)
 
     
-    xm1 = mean(X[ta,:],1); xm2 = mean(X[tb,:],1)
-    ym1 = mean(Y[ta,:],1); ym2 = mean(Y[tb,:],1)
+    xm1, xm2 = mean(X[ta,:], dims=1), mean(X[tb,:], dims=1)
+    ym1, ym2 = mean(Y[ta,:], dims=1), mean(Y[tb,:], dims=1)
     
-    X1train = X[ta,:].-xm1; Y1train = Y[ta,:].-ym1 
-    X2train = X[tb,:].-xm2; Y2train = Y[tb,:].-ym2
-    X1test = X[ta,:].-xm2; Y1test = Y[ta,:].-ym2 
-    X2test = X[tb,:].-xm1; Y2test = Y[tb,:].-ym1 
+    X1train, Y1train = X[ta,:].-xm1, Y[ta,:].-ym1 
+    X2train, Y2train = X[tb,:].-xm2, Y[tb,:].-ym2
+    X1test, Y1test = X[ta,:].-xm2, Y[ta,:].-ym2 
+    X2test, Y2test = X[tb,:].-xm1, Y[tb,:].-ym1 
     
     k1pars = kerneltype(X1train)
     k2pars = kerneltype(X2train)
@@ -258,18 +256,18 @@ function CVfn(parm::T, X::T, Y::T, modelfn::Function, kerneltype::DataType; verb
         par = parm[i,:]
         model1 = modelfn(par, X1train, Y1train, k1pars)
         model2 = modelfn(par, X2train, Y2train, k2pars)
-        W1 = model1.W[:,1:dcv]; W2 = model2.W[:,1:dcv]        
-        A1 = model1.A[:,1:dcv]; A2 = model2.A[:,1:dcv]
-        scale!(W1, vec(sign(W1[1,:])))
-        scale!(W2, vec(sign(W2[1,:])))
-        scale!(A1, vec(sign(A1[1,:])))
-        scale!(A2, vec(sign(A2[1,:])))
+        W1, W2 = model1.W[:,1:dcv], model2.W[:,1:dcv]        
+        A1, A2 = model1.A[:,1:dcv], model2.A[:,1:dcv]
+        W1 .*= sign.(W1[1:1,:])
+        W2 .*= sign.(W2[1:1,:])
+        A1 .*= sign.(A1[1:1,:])
+        A2 .*= sign.(A2[1:1,:])
         Rcv = [X2test * W1; X1test * W2]
         Tcv = [Y2test * A1; Y1test * A2]
         pargrid[i,end] = Rsq_adj(Rcv, Tcv, Int(par[3]))
     end
     
-    imax = indmax(pargrid[:,end])
+    imax = argmax(pargrid[:,end])
     return pargrid[imax,:]
 end
 
