@@ -8,18 +8,22 @@ export KernelParameters, GaussianKP, PolynomialKP
 export gradvecfield
 export bf, cca, gKCCA
 export CVfn, Rsq_adj
-export whiten
+export whiten, zscore
 include("MLKernels.jl")
 
 """
-    KernelParameters: An abstract type.
+    KernelParameters
+
+An abstract type. \n
 All KernelParameters types contain certain parameters which are later passed to internal functions `Kf` and `∇Kf`. \n
 A KernelParameters type is set using e.g. `PolynomialKP(X::Matrix{Float64})` or `GaussianKP(X::Matrix{Float64})`. 
 """
 abstract type KernelParameters end
 
 """
-    GaussianKP: For the gaussian kernel
+    GaussianKP(X)
+    
+For the gaussian kernel.
 """
 struct GaussianKP <: KernelParameters
     xx::Matrix{Float64}
@@ -33,12 +37,12 @@ function GaussianKP(X::Matrix{Float64})
 end
 
 
-    function Kf(par::Array{T}, X::Matrix{T}, kpars::GaussianKP) where T<:Float64
+    function Kf(par::Array{Float64}, X::Matrix{Float64}, kpars::GaussianKP)
         sx2 = 2*par[1]*par[1]*kpars.varx
         return exp.(-kpars.xx/sx2)
     end
 
-    function ∇Kf(par::Array{T}, X::Matrix{T}, kpars::GaussianKP) where T<:Float64
+    function ∇Kf(par::Array{Float64}, X::Matrix{Float64}, kpars::GaussianKP)
         n,p = size(X)
         sx2 = 2*par[1]*par[1]*kpars.varx
         Gx = Kf(par, X, kpars)
@@ -48,7 +52,9 @@ end
 
 
 """
-    PolynomialKP: For the polynomial kernel 
+    PolynomialKP(X)
+
+For the polynomial kernel.
 """
 struct PolynomialKP <: KernelParameters 
     xx::Matrix{Float64}    
@@ -59,11 +65,11 @@ struct PolynomialKP <: KernelParameters
 end
 
 
-    function Kf(par::Array{T}, X::Matrix{T}, kpars::PolynomialKP) where T<:Float64
+    function Kf(par::Array{Float64}, X::Matrix{Float64}, kpars::PolynomialKP)
         return (kpars.xx).^par[1]
     end
 
-    function ∇Kf(par::Array{T}, X::Matrix{T}, kpars::PolynomialKP) where T<:Float64
+    function ∇Kf(par::Array{Float64}, X::Matrix{Float64}, kpars::PolynomialKP)
         n,p = size(X)
         m = par[1]
         ∇K = Float64[m*X[k,j]*kpars.xx[i,k]^(m-1.0)  for i in 1:n, k in 1:n, j in 1:p ]
@@ -73,8 +79,9 @@ end
 
 
 """
-    ModelObj: A type to hold statistical model results
-Such as the matrices `W, R, A, T`, where `R=XW` and `T=YA`.  
+    ModelObj(W, R, A, T, evals, pars, method)
+    
+A type to hold statistical model results, such as the matrices `W, R, A, T`, where `R=XW` and `T=YA`.  
 """
 struct ModelObj
     W::Matrix{Float64}
@@ -89,9 +96,11 @@ end
 
 
 """
-    InputSpace: A type to hold the `X` and `Y` fields of the Input space
-InputSpace(X, Y, d, lat): The fields are whitened if `d=[d1, d2]` is supplied.
-Area weighting is applied if `lat` is supplied.      
+    InputSpace(X, Y, d, lat)
+
+A type to hold the `X` and `Y` fields of the Input space.  
+The fields are whitened if `d=[d1, d2]` is supplied.  
+Area weighting is applied if `lat` is supplied.
 """
 struct InputSpace
     X::Matrix{Float64} 
@@ -110,10 +119,11 @@ end
 
 
 """
-    gradvecfield(par::Array{Float64}, X::T, Y::T, kpars::KernelParameters) where T<:Matrix{Float64}:
+    gradvecfield(par::Array, X::Matrix, Y::Matrix, kpars::KernelParameters)
+
 Compute the gradient vector or gradient matrix at each instance of the `X` and `Y` fields, by making use of a kernel feature space.
 """
-function gradvecfield(par::Array{Float64}, X::T, Y::T, kpars::KernelParameters ) where T<:Matrix{Float64}
+function gradvecfield(par::Array{Float64}, X::Matrix{Float64}, Y::Matrix{Float64}, kpars::KernelParameters)
     n,p = size(X)
     Gx = Kf(par, X, kpars) + (10.0^par[2])*n*I
     ∇K = ∇Kf(par, X, kpars)
@@ -123,7 +133,8 @@ end
 
 
 """
-    bf(x::Vector{Float64}, df::Int):
+    bf(x::Vector, df::Int)
+
 Compute a piecewise linear basis matrix for the vector x.
 """
 function bf(x::Vector{Float64}, df::Int)
@@ -143,10 +154,11 @@ function bf(x::Vector{Float64}, df::Int)
 end
 
 """
-    cca(v::Array{Float64}, X::T,Y::T) where T<:Matrix{Float64}:
+    cca(v::Array, X::Matrix, Y::Matrix)
+
 Regularized Canonical Correlation Analysis using SVD. 
 """
-function cca(v::Array{Float64}, X::T,Y::T) where T<:Matrix{Float64}
+function cca(v::Array{Float64}, X::Matrix{Float64}, Y::Matrix{Float64})
 #    n,p = size(X)
     q = size(Y, 2)
     
@@ -165,11 +177,12 @@ function cca(v::Array{Float64}, X::T,Y::T) where T<:Matrix{Float64}
 end
 
 
-cca(v::Array{Float64}, X::T,Y::T, kpars::KernelParameters) where {T<:Matrix{Float64}} = cca(v, X, Y)
+cca(v::Array{Float64}, X::Matrix{Float64}, Y::Matrix{Float64}, kpars::KernelParameters) = cca(v, X, Y)
 
 
 """
-    gKCCA(par::Array{Float64}, X::Matrix{Float64}, Y::Matrix{Float64}, kpars::KernelParameters):
+    gKCCA(par::Array, X::Matrix, Y::Matrix, kpars::KernelParameters)
+
 Compute the projection matrices and components for gKCCA.
 """
 function gKCCA(par::Array{Float64}, X::Matrix{Float64}, Y::Matrix{Float64}, kpars::KernelParameters)
@@ -198,7 +211,9 @@ end
 
 
 """
-    whiten(x::Matrix{Float64}, d::Float64; lat=nothing): Whiten matrix
+    whiten(X::Matrix, d::Float64; lat=nothing)
+ 
+Whiten `X`.  \n
 `d` (0-1) Percentage variance of components to retain. \n
 `lat` Latitudinal area-weighting.
 """
@@ -214,10 +229,11 @@ end
 
 
 """
-    CVfn(parm::T, X::T, Y::T, modelfn::Function, kerneltype::DataType; verbose::Bool=true, dcv::Int64=2) where T<:Matrix{Float64}
+    CVfn(parm::Matrix, X::Matrix, Y::Matrix, modelfn::Function, kerneltype::DataType; verbose=true, dcv=2)
+
 Cross-validation function
 """
-function CVfn(parm::T, X::T, Y::T, modelfn::Function, kerneltype::DataType; verbose::Bool=true, dcv::Int64=2) where T<:Matrix{Float64}
+function CVfn(parm::Matrix{Float64}, X::Matrix{Float64}, Y::Matrix{Float64}, modelfn::Function, kerneltype::DataType; verbose::Bool=true, dcv::Int64=2)
     
     # free parameters
     # df = par[3] # Number of segments in PWLM
@@ -272,10 +288,11 @@ function CVfn(parm::T, X::T, Y::T, modelfn::Function, kerneltype::DataType; verb
 end
 
 """
-    Rsq_adj(Tx::T, Ty::T, df::Int) where T<:Array{Float64}: 
+    Rsq_adj(Tx::Array, Ty::Array, df::Int)
+
 Cross-validation metric
 """
-function Rsq_adj(Tx::T, Ty::T, df::Int) where {T<:Array{Float64}}
+function Rsq_adj(Tx::Array{Float64}, Ty::Array{Float64}, df::Int)
     y = vec(Ty)
     n,p = size(Tx)
     o = ones(n*p)

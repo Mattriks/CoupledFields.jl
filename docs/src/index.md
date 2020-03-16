@@ -1,18 +1,28 @@
 
-# CoupledFields Documentation
+# CoupledFields.jl
 
-## Guide Outline
+## Introduction
+
+A julia package for working with coupled fields.
+
+## Guide
 
 ```@contents
-Pages = map(file -> joinpath("man", file), readdir("man"))
+Pages = joinpath.("man", readdir("man"))
 Depth = 1
 ```
 
-## Library Outline
+## Library
 
 ```@contents
 Pages = [joinpath("lib","library.md")]
 ```
 
 
+## Documentation
 
+The documentation was built using [Documenter.jl](https://github.com/JuliaDocs).
+
+```@example
+println("Documentation built with Julia $(VERSION).") # hide
+```

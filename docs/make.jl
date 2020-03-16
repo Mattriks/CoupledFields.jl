@@ -1,11 +1,17 @@
 using Documenter, CoupledFields
 
 makedocs(
-    modules = [CoupledFields]
+    modules = [CoupledFields],
+    clean = false,
+    sitename = "CoupledFields.jl",
+    pages = [
+        "Home" => "index.md",
+        "Guide" => ["man/Example1.md", "man/Example2.md"],
+        "Library" => "lib/library.md"
+    ],
 )
 
+
 deploydocs(
-    deps   = Deps.pip("mkdocs", "python-markdown-math"),
-    repo   = "github.com/Mattriks/CoupledFields.jl.git",
-    julia  = "release"
+    repo = "github.com/Mattriks/CoupledFields.jl.git",
 )

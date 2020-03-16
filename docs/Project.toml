@@ -1,0 +1,9 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+CoupledFields = "7ad07ef1-bdf2-5661-9d2b-286fd4296dac"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Gadfly = "c91e804a-d5a3-530f-b6f0-dfbca275c004"
+
+
+[compat]
+Documenter = "~0.22"
