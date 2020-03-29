@@ -1,7 +1,6 @@
 # Example 2
 
 ```@example
-#=
 using DataFrames, Compose, Gadfly
 using CoupledFields, LinearAlgebra, Random, Statistics
 set_default_graphic_size(21cm, 14cm)
@@ -43,19 +42,18 @@ plot(D1, xgroup=:df,
         layer(x=:x, y=:y2, Geom.line, Theme(default_color=colorant"red")),
         layer(x=:x, y=:y, Geom.point)
     ),
-    Guide.ylabel("YA"),
+    Guide.ylabel("<b>YA₁</b>"),
     Theme(plot_padding=[0mm], major_label_font_size=mlfs)
  )
 end
 
 pb = plotfn(4:6)
-push!(pb, Guide.xlabel("XW (gKCCA)" ))
+push!(pb, Guide.xlabel("<b>XW₁</b> (gKCCA)" ))
 
 compose(context(),
     (context(0, 0, 1.0, 0.45), render(plotfn(1:3))),
     (context(0, 0.45, 1.0, 0.55), render(pb))
 )
-=#
 ```
 
 

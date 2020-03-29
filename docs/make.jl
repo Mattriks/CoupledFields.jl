@@ -1,4 +1,4 @@
-using Documenter, CoupledFields
+using Documenter, CoupledFields, Cairo
 
 makedocs(
     modules = [CoupledFields],
