@@ -1,4 +1,4 @@
-using LinearAlgebra, StatsBase, CoupledFields
+using LinearAlgebra, CoupledFields
 # using Base.Test
 
 # write your own tests here
@@ -9,8 +9,8 @@ function simfields(t::Vector{Float64}, p::Int64, σₑ::Float64)
     n = length(t)
     Xa = sin.(2π*repeat(t, inner=(1,p))/5.0) * diagm(0=>rand([-1, 1], p))
     Xb = sin.(2π*repeat(t, inner=(1,p))/2.5 .+ 1.5π) * diagm(0=>rand([-1, 1], p))
-    Xa = StatsBase.zscore(Xa,1) .+ 0.05*randn(n, p)
-    Xb = StatsBase.zscore(Xb,1) .+ σₑ*randn(n, p)
+    Xa = zscore(Xa,1) .+ 0.05*randn(n, p)
+    Xb = zscore(Xb,1) .+ σₑ*randn(n, p)
     return Xa, Xb
 end
 
