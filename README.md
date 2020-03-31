@@ -22,10 +22,13 @@ Also CoupledFields doesn’t require a closed-form function, it can be used if y
 
 ## Installation
 
-Within Julia:
+Install using the Julia package manager. From the Julia REPL, type `]` to enter the Pkg REPL mode and run:
+```
+pkg> add CoupledFields
+```
+or from the Julia prompt:
 ```julia
-using Pkg
-julia> Pkg.add("CoupledFields")
+julia> using Pkg; Pkg.add("CoupledFields")
 ```
 
 ## Documentation
@@ -33,6 +36,6 @@ julia> Pkg.add("CoupledFields")
 - [**LATEST**][docs-latest-url]
 
 
-[docs-latest-url]: https://Mattriks.github.io/CoupledFields.jl/latest
+[docs-latest-url]: https://Mattriks.github.io/CoupledFields.jl/dev
 [docs-stable-url]: https://Mattriks.github.io/CoupledFields.jl/stable
 
