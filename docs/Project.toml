@@ -8,4 +8,4 @@ Gadfly = "c91e804a-d5a3-530f-b6f0-dfbca275c004"
 
 
 [compat]
-Documenter = "~0.24"
+Documenter = "0.27"
