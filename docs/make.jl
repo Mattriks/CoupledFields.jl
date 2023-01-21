@@ -2,6 +2,9 @@ using Documenter, CoupledFields, Cairo
 
 makedocs(
     modules = [CoupledFields],
+    format = Documenter.HTML(
+        prettyurls = get(ENV, "CI", nothing) == "true"
+    ),
     clean = false,
     sitename = "CoupledFields.jl",
     pages = [
