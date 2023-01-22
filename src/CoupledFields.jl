@@ -5,7 +5,7 @@ using Statistics
 using StatsBase: sample, zscore
 export InputSpace, ModelObj
 export KernelParameters, GaussianKP, PolynomialKP
-export gradvecfield
+export gradvecfield, gradient
 export bf, cca, gKCCA
 export CVfn, Rsq_adj
 export whiten, zscore
@@ -307,7 +307,7 @@ function Rsq_adj(Tx::Array{Float64}, Ty::Array{Float64}, df::Int)
 end    
 
 
-
+include("misc.jl")
 
 
 end
