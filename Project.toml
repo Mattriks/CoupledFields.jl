@@ -9,8 +9,8 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 LazyGrids = "7031d0ef-c40d-4431-b2f8-61a8d2f650db"
 
 [compat]
-StatsBase = "0.30, 0.31, 0.32, 0.33"
-LazyGrids = "0.4"
+StatsBase = "0.30, 0.31, 0.32, 0.33, 0.34"
+LazyGrids = "0.4, 0.5"
 julia = "1.6"
 
 
